@@ -163,14 +163,7 @@ for exchange in get_exchanges():
             
 
     
-#print(pairs_matrix("BTCE"))
-#test main de triangular patern
-"""portfolio = 100 #BCU
 
-portfolio = portfolio*float(get_ticker("BITF","LTC/USD")['data'][0]['ask'])*0.998
-portfolio = portfolio/float(get_ticker("BITF","BTC/USD")['data'][0]['bid'])*0.998
-print(portfolio/float(get_ticker("BITF","LTC/BTC")['data'][0]['bid'])*0.998)
-print(get_ticker("BITF","AZA/USD")['data'])"""
 
     
     
