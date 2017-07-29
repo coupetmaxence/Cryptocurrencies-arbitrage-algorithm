@@ -11,6 +11,7 @@ import numpy as np
 API_KEY = 'cb4cb45b2e8ce8111f976868bde66a9d'
 API_SECRET = '1e110807c6ea9f6042a70a271dff681b'
 
+# Returns the complete list of exchanges available ex: KRKN for Kraken, BITF for Bitfinex
 def get_exchanges():
     headers = {
             'Content-Type': 'application/json',
@@ -24,6 +25,7 @@ def get_exchanges():
         list_exchanges.append(exchange['exch_code'])
     return list_exchanges
 
+# Returns the complete list of markets for a given exchange ex : BTC/USD
 def get_markets(exchange):
     if(exchange in get_exchanges()):
         values = """
@@ -44,7 +46,8 @@ def get_markets(exchange):
         return list_markets
     else:
         return "Invalid exchange"
-    
+
+# Returns various ticker infos on a specific market from a specific exchange (bid/ask price, last trade price, volume)
 def get_ticker(exchange, market):
     values = """
         {
@@ -69,6 +72,7 @@ def get_ticker(exchange, market):
             json_data = request.json()['data'][0]
     return(json_data)
 
+# Returns a simple list of currencies available on a given exchange ex : EUR, BTC,... (no pairs here)
 def list_currencies_market(exchange):
     markets = get_markets(exchange)
     list_currencies = []
@@ -82,7 +86,7 @@ def list_currencies_market(exchange):
             list_currencies.append(currency2)
     return markets, list_currencies
 
-
+# Returns an upper-triangular matrix with the exchange rate
 def pairs_matrix(exchange):
     
     # Creating the pairs matrix with -1 
@@ -110,6 +114,7 @@ def pairs_matrix(exchange):
             
     return [currencies_matrix, list_currencies]
 
+# Returns a list of all the combinaisons of triplets available on an exchange
 def triangular_combinaison(pairs_matrix, list_currencies):
     list_triplets = []
     offset = 0
@@ -122,6 +127,7 @@ def triangular_combinaison(pairs_matrix, list_currencies):
         offset = offset + 1
     return list_triplets
 
+# Find arbitrage and print it if it's a success
 def triangular_pattern(pairs_matrix, list_triplets):
     profitable_counter = 0
     non_profitable_counter = 0
