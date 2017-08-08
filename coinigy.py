@@ -7,11 +7,14 @@ Created on Tue Jul 25 17:49:48 2017
 import requests
 import itertools
 import numpy as np
+from threading import Thread
+from multiprocessing import Queue
+import time
+import csv
 
 API_KEY = 'cb4cb45b2e8ce8111f976868bde66a9d'
 API_SECRET = '1e110807c6ea9f6042a70a271dff681b'
 
-# Returns the complete list of exchanges available ex: KRKN for Kraken, BITF for Bitfinex
 def get_exchanges():
     headers = {
             'Content-Type': 'application/json',
@@ -25,96 +28,118 @@ def get_exchanges():
         list_exchanges.append(exchange['exch_code'])
     return list_exchanges
 
-# Returns the complete list of markets for a given exchange ex : BTC/USD
 def get_markets(exchange):
-    if(exchange in get_exchanges()):
-        values = """
-        {
-            "exchange_code": """+'"'+exchange+'"'+"""
-        }
-        """
-        headers = {
-            'Content-Type': 'application/json',
-            'X-API-KEY': API_KEY,
-            'X-API-SECRET': API_SECRET
+    try:
+        if(exchange in get_exchanges()):
+            values = """
+            {
+                "exchange_code": """+'"'+exchange+'"'+"""
             }
-        request = requests.request('POST','https://api.coinigy.com/api/v1/markets', data=values, headers=headers)
-        json_data = request.json()['data']
-        list_markets = []
-        for market in json_data:
-            list_markets.append(market['mkt_name'])
-        return list_markets
-    else:
+            """
+            headers = {
+                'Content-Type': 'application/json',
+                'X-API-KEY': API_KEY,
+                'X-API-SECRET': API_SECRET
+                }
+            request = requests.request('POST','https://api.coinigy.com/api/v1/markets', data=values, headers=headers)
+            json_data = request.json()['data']
+            list_markets = []
+            for market in json_data:
+                list_markets.append(market['mkt_name'])
+            return list_markets
+        else:
+            return "Invalid exchange"
+    except:
         return "Invalid exchange"
-
-# Returns various ticker infos on a specific market from a specific exchange (bid/ask price, last trade price, volume)
-def get_ticker(exchange, market):
-    values = """
-        {
-            "exchange_code": """+'"'+exchange+'"'+""",
-            "exchange_market": """+'"'+market+'"'+"""
-        }
-        """
-    headers = {
-            'Content-Type': 'application/json',
-            'X-API-KEY': API_KEY,
-            'X-API-SECRET': API_SECRET
-            }
-    status = ""
-    json_data = 1
     
-    # Prevent error 503 for Coinigy servers
-    while(status != "200"):
-        request = requests.request('POST','https://api.coinigy.com/api/v1/ticker', data=values, headers=headers)
-        status = str(request)[11:14]
+def get_ticker(exchange, market):
+    try:
+        values = """
+            {
+                "exchange_code": """+'"'+exchange+'"'+""",
+                "exchange_market": """+'"'+market+'"'+"""
+            }
+            """
+        headers = {
+                'Content-Type': 'application/json',
+                'X-API-KEY': API_KEY,
+                'X-API-SECRET': API_SECRET
+                }
+        status = ""
+        json_data = 1
         
-        if(status=="200"):
-            json_data = request.json()['data'][0]
-    return(json_data)
+        # Prevent error 503 for Coinigy servers
+        while(status != "200"):
+            request = requests.request('POST','https://api.coinigy.com/api/v1/ticker', data=values, headers=headers)
+            status = str(request)[11:14]
+            
+            if(status=="200"):
+                json_data = request.json()['data'][0]
+        return [True,json_data]
+    except:
+        print("Error while loading data from server")
+        return [False, None]
 
-# Returns a simple list of currencies available on a given exchange ex : EUR, BTC,... (no pairs here)
 def list_currencies_market(exchange):
-    markets = get_markets(exchange)
-    list_currencies = []
-    for market in markets:
-        currency1 = market[0:3]
-        if(not currency1 in list_currencies):
-            list_currencies.append(currency1)
-        
-        currency2 = market[4:8]
-        if(not currency2 in list_currencies):
-            list_currencies.append(currency2)
-    return markets, list_currencies
+    try:
+        markets = get_markets(exchange)
+        if markets !="Invalid exchange":
+            list_currencies = []
+            for market in markets:
+                processing = True
+                i = 1
+                currency1 = market[0:3]
+                while processing:
+                    if(market[i]=='/'):
+                        processing = False
+                        currency1 = market[0:i]
+                    else:
+                        i=i+1
+                if(not currency1 in list_currencies):
+                    list_currencies.append(currency1)
+                
+                currency2 = market[i+1:]
+                if(not currency2 in list_currencies):
+                    list_currencies.append(currency2)
+            return [True, markets, list_currencies]
+        else:
+            return [False, None, None]
+    except:
+        print("Trouble in list currencies")
+        return [False, None, None]
 
-# Returns an upper-triangular matrix with the exchange rate
+
 def pairs_matrix(exchange):
     
     # Creating the pairs matrix with -1 
     # -1 represents the fact that the pair doesn't exist in the current exchange
-    markets, list_currencies = list_currencies_market(exchange)
+    good_process, markets, list_currencies = list_currencies_market(exchange)
+    if good_process:
+        currencies_matrix = {(x):{} for x in list_currencies}
+        for market in list_currencies:
+            currencies_matrix[market] = {(x):[-1,-1] for x in list_currencies}
     
-    currencies_matrix = {(x):{} for x in list_currencies}
-    for market in list_currencies:
-        currencies_matrix[market] = {(x):[-1,-1] for x in list_currencies}
+        # Filling the pairs matrix with API datas
+        offset = 0
+        for x_market in list_currencies:
+            # Not a complete matrix just an upper triangular matrix for time optimisation
+            for y_market in list_currencies[offset:]:
+                if(x_market+"/"+y_market in markets):
+                    good_process, ticker = get_ticker(exchange, x_market+"/"+y_market)
+                    if good_process and ticker['ask']!=None and ticker['bid']!=None:
+                        currencies_matrix[x_market][y_market] = [float(ticker['ask']), float(ticker['bid']),ticker['timestamp']]
+                        currencies_matrix[y_market][x_market] = [1/float(ticker['ask']), 1/float(ticker['bid']),ticker['timestamp']]
+                elif(y_market+"/"+x_market in markets):
+                    good_process, ticker = get_ticker(exchange, y_market+"/"+x_market)
+                    if good_process and ticker['ask']!=None and ticker['bid']!=None:
+                        currencies_matrix[x_market][y_market] = [1/float(ticker['ask']), 1/float(ticker['bid']),ticker['timestamp']]
+                        currencies_matrix[y_market][x_market] = [float(ticker['ask']), float(ticker['ask']),ticker['timestamp']]
+            offset = offset + 1
+                
+        return [True, currencies_matrix, list_currencies]
+    else:
+        return [False, None, None]
 
-    # Filling the pairs matrix with API datas
-    offset = 0
-    for x_market in list_currencies:
-        # Not a complete matrix just an upper triangular matrix for time optimisation
-        for y_market in list_currencies[offset:]:
-            if(x_market+"/"+y_market in markets):
-                ticker = get_ticker(exchange, x_market+"/"+y_market)
-                currencies_matrix[x_market][y_market] = [float(ticker['ask']), float(ticker['bid'])]
-                currencies_matrix[y_market][x_market] = [1/float(ticker['ask']), 1/float(ticker['bid'])]
-            elif(y_market+"/"+x_market in markets):
-                ticker = get_ticker(exchange, y_market+"/"+x_market)
-                currencies_matrix[x_market][y_market] = [1/float(ticker['ask']), 1/float(ticker['bid'])]
-                currencies_matrix[y_market][x_market] = [float(ticker['ask']), float(ticker['bid'])]
-        offset = offset + 1
-            
-    return [currencies_matrix, list_currencies]
-
-# Returns a list of all the combinaisons of triplets available on an exchange
 def triangular_combinaison(pairs_matrix, list_currencies):
     list_triplets = []
     offset = 0
@@ -127,47 +152,62 @@ def triangular_combinaison(pairs_matrix, list_currencies):
         offset = offset + 1
     return list_triplets
 
-# Find arbitrage and print it if it's a success
-def triangular_pattern(pairs_matrix, list_triplets):
-    profitable_counter = 0
-    non_profitable_counter = 0
+def triangular_pattern(exchange, pairs_matrix, list_triplets, counter):
+
+    with open("historic_data.csv", "a", newline="") as csv_file:
+        writer = csv.writer(csv_file, delimiter=',')
+        writer.writerow([exchange])
+    counter[0] = counter[0] + len(list_triplets)
     for triplet in list_triplets:
         combinaisons = itertools.permutations(triplet)
         for combinaison in combinaisons:
+            counter[1] = counter[1] + 1
             exchange_rates = []
+            timestamp = ""
             if(pairs_matrix[combinaison[0]][combinaison[1]][0]==-1):
-                exchange_rates.append(1/pairs_matrix[combinaison[1]][combinaison[0]][1])
+                exchange_rates.append(1/pairs_matrix[combinaison[1]][combinaison[0]][0])
+                timestamp = pairs_matrix[combinaison[1]][combinaison[0]][2]
             else:
                 exchange_rates.append(pairs_matrix[combinaison[0]][combinaison[1]][1])
+                timestamp = pairs_matrix[combinaison[0]][combinaison[1]][2]
                 
             if(pairs_matrix[combinaison[1]][combinaison[2]][0]==-1):
-                exchange_rates.append(1/pairs_matrix[combinaison[2]][combinaison[1]][1])
+                exchange_rates.append(1/pairs_matrix[combinaison[2]][combinaison[1]][0])
             else:
                 exchange_rates.append(pairs_matrix[combinaison[1]][combinaison[2]][1])
         
             if(pairs_matrix[combinaison[2]][combinaison[0]][0]==-1):
                 exchange_rates.append(1/pairs_matrix[combinaison[0]][combinaison[2]][0])
             else:
-                exchange_rates.append(pairs_matrix[combinaison[2]][combinaison[0]][0])
+                exchange_rates.append(pairs_matrix[combinaison[2]][combinaison[0]][1])
         
             fee = 0.998
             final_rate = 100*exchange_rates[0]*exchange_rates[1]*exchange_rates[2]*fee**3 -100
-            if(final_rate > 0):
+            if(final_rate > 5):
+                counter[2] = counter[2]+1
+                with open("historic_data.csv", "a", newline="") as csv_file:
+                    writer = csv.writer(csv_file, delimiter=',')
+                    writer.writerow([timestamp,combinaison[0],combinaison[1],combinaison[2],combinaison[0],np.round(final_rate,4)])
                 print("Combinaison : "+combinaison[0]+"/"+combinaison[1]+"/"+combinaison[2]+"/"+combinaison[0]+" Gain rate :"+str(np.round(final_rate,4))+" %")
-    
 
 
-
-
+start = time.time()
+counter = [0,0,0]
 for exchange in get_exchanges():
-    if(exchange!="KRKN" and exchange!="BTRX"):
+    forbidden_exchanges = ["KRKZ"]
+    if(not exchange in forbidden_exchanges):
         print("Exchange : "+exchange)
-        pairs_result = pairs_matrix(exchange)
-        triplets = triangular_combinaison(pairs_result[0], pairs_result[1])
-        triangular_pattern(pairs_result[0], triplets)
+        good_process, currencies_matrix, list_currencies = pairs_matrix(exchange)
+        if good_process:
+            triplets = triangular_combinaison(currencies_matrix, list_currencies)
+            triangular_pattern(exchange, currencies_matrix, triplets, counter)
+            print(counter)
+            print("Time since beggining : "+ str(time.time()-start))
+        else:
+            print("Error of processing")
     
             
-
+input("Press Enter to continue...")
     
 
 
