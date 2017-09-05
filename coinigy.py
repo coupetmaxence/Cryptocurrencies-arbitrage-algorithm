@@ -11,9 +11,11 @@ from threading import Thread
 from multiprocessing import Queue
 import time
 import csv
+import collections
 
-API_KEY = 'cb4cb45b2e8ce8111f976868bde66a9d'
-API_SECRET = '1e110807c6ea9f6042a70a271dff681b'
+
+API_KEY = '81c5dac5530270f443bde8dcdb39ef97'
+API_SECRET = 'ac50c091e0d83684fdddfb8444ca3e47'
 
 def get_exchanges():
     headers = {
@@ -134,6 +136,7 @@ def pairs_matrix(exchange):
                     if good_process and ticker['ask']!=None and ticker['bid']!=None:
                         currencies_matrix[x_market][y_market] = [1/float(ticker['ask']), 1/float(ticker['bid']),ticker['timestamp']]
                         currencies_matrix[y_market][x_market] = [float(ticker['ask']), float(ticker['ask']),ticker['timestamp']]
+                    
             offset = offset + 1
                 
         return [True, currencies_matrix, list_currencies]
@@ -148,7 +151,13 @@ def triangular_combinaison(pairs_matrix, list_currencies):
             if(pairs_matrix[x_currency][y_currency][0] != -1):
                 for temp_currency in list_currencies:
                     if((pairs_matrix[temp_currency][y_currency][0] != -1 or pairs_matrix[y_currency][temp_currency][0] != -1) and (pairs_matrix[temp_currency][x_currency][0] != -1 or pairs_matrix[x_currency][temp_currency][0] != -1) ):
-                        list_triplets.append([x_currency, y_currency, temp_currency])
+                        compare = lambda x, y: collections.Counter(x) == collections.Counter(y)
+                        bol = True
+                        for _ in list_triplets:
+                            if(compare(_,[x_currency, y_currency, temp_currency])):
+                                bol = False
+                        if(bol):
+                            list_triplets.append([x_currency, y_currency, temp_currency])
         offset = offset + 1
     return list_triplets
 
@@ -160,10 +169,12 @@ def triangular_pattern(exchange, pairs_matrix, list_triplets, counter):
     counter[0] = counter[0] + len(list_triplets)
     for triplet in list_triplets:
         combinaisons = itertools.permutations(triplet)
+        list_rates = []
+        timestamp = ""
         for combinaison in combinaisons:
             counter[1] = counter[1] + 1
             exchange_rates = []
-            timestamp = ""
+            
             if(pairs_matrix[combinaison[0]][combinaison[1]][0]==-1):
                 exchange_rates.append(1/pairs_matrix[combinaison[1]][combinaison[0]][0])
                 timestamp = pairs_matrix[combinaison[1]][combinaison[0]][2]
@@ -183,29 +194,43 @@ def triangular_pattern(exchange, pairs_matrix, list_triplets, counter):
         
             fee = 0.998
             final_rate = 100*exchange_rates[0]*exchange_rates[1]*exchange_rates[2]*fee**3 -100
+            list_rates.append([combinaison[0]+"/"+combinaison[1]+"/"+combinaison[2]+"/"+combinaison[0],final_rate])
             if(final_rate > 5):
+                print("Rates : "+str(exchange_rates[0])+" ; "+str(exchange_rates[1])+" ; "+str(exchange_rates[2]))
                 counter[2] = counter[2]+1
-                with open("historic_data.csv", "a", newline="") as csv_file:
-                    writer = csv.writer(csv_file, delimiter=',')
-                    writer.writerow([timestamp,combinaison[0],combinaison[1],combinaison[2],combinaison[0],np.round(final_rate,4)])
                 print("Combinaison : "+combinaison[0]+"/"+combinaison[1]+"/"+combinaison[2]+"/"+combinaison[0]+" Gain rate :"+str(np.round(final_rate,4))+" %")
+        index, value =max_index_value(list_rates)
+        if(value>5):
+            with open("historic_data.csv", "a", newline="") as csv_file:
+                writer = csv.writer(csv_file, delimiter=',')
+                writer.writerow([timestamp,list_rates[index][0],np.round(value,4)])
+
+def max_index_value(tab):
+    max_value = tab[0][1]
+    max_index = 0
+    for index, subtab in enumerate(tab):
+        if(subtab[1] > max_value):
+            max_index= index
+            max_value = subtab[1]
+    return max_index, max_value
 
 
 start = time.time()
 counter = [0,0,0]
-for exchange in get_exchanges():
-    forbidden_exchanges = ["KRKZ"]
-    if(not exchange in forbidden_exchanges):
-        print("Exchange : "+exchange)
-        good_process, currencies_matrix, list_currencies = pairs_matrix(exchange)
-        if good_process:
-            triplets = triangular_combinaison(currencies_matrix, list_currencies)
-            triangular_pattern(exchange, currencies_matrix, triplets, counter)
-            print(counter)
-            print("Time since beggining : "+ str(time.time()-start))
-        else:
-            print("Error of processing")
-    
+while(True): 
+    for exchange in get_exchanges():
+        forbidden_exchanges = ["KRKZ"]
+        if(not exchange in forbidden_exchanges):
+            print("Exchange : "+exchange)
+            good_process, currencies_matrix, list_currencies = pairs_matrix(exchange)
+            if good_process:
+                triplets = triangular_combinaison(currencies_matrix, list_currencies)
+                triangular_pattern(exchange, currencies_matrix, triplets, counter)
+                print(counter)
+                print("Time since beggining : "+ str(time.time()-start))
+            else:
+                print("Error of processing")
+
             
 input("Press Enter to continue...")
     
