@@ -7,6 +7,7 @@ Created on Tue Sep 26 16:50:23 2017
 import xlsxwriter
 import xlrd
 import os
+import openpyxl 
 from operator import itemgetter
 from thread_pooling import ThreadPool
 from http_API_requests import get_exchanges, get_ticker
@@ -46,9 +47,11 @@ def write_csv(market,liste):
             index_ligne=0
             for rownum in range(sh.nrows):
                 index_ligne+=1
+            wb2=openpyxl.load_workbook('arbitrage.xlsx')
+            sheet=wb2[pair.replace("/","_")]
             index_market+=1
-            
-            for i in j:   
+            index=index_ligne+2
+            for i in j:
                 a=str(i[0])
                 b=str(i[1])
                 c=float(i[2])
@@ -56,14 +59,15 @@ def write_csv(market,liste):
                 e=float(i[4])
                 f=float(i[5])
                 g=float(i[6])
-                sh.write_string(index_ligne,0,a)
-                sh.write_string(index_ligne,1,b)
-                sh.write_number(index_ligne,2,c)
-                sh.write_number(index_ligne,3,d)
-                sh.write_number(index_ligne,4,e)
-                sh.write_number(index_ligne,5,f)
-                sh.write_number(index_ligne,6,g) 
-                index_ligne+=1 
+                sheet['A'+str(index)]=a
+                sheet['B'+str(index)]=b
+                sheet['C'+str(index)]=c
+                sheet['D'+str(index)]=d
+                sheet['E'+str(index)]=e
+                sheet['F'+str(index)]=f
+                sheet['G'+str(index)]=g
+                index+=1 
+            wb2.save('arbitrage.xlsx')
     else:        
         wb=xlsxwriter.Workbook('arbitrage.xlsx')
         bold = wb.add_format({'bold': 1})
