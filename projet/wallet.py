@@ -48,7 +48,11 @@ def price_type_id():
 #print(get_accounts())
 
 
-print(add_order('122758','7','2514','1','3','293.74','0.010'))
+#print(add_order('122758','7','2514','1','3','293.74','0.010'))
 #print(get_order())
 
-print(limit_price_sell('BITF','USD/ETH'))
+#print(limit_price_sell('BITF','USD/ETH'))
+
+
+
+
