@@ -101,33 +101,37 @@ def write_csv(market,liste):
                 worksheet.write_number(index,6,g) 
                 index+=1
     
-market=['BTC/USD','ETH/USD']#,'ETH/BTC','LTC/USD','LTC/BTC','ETC/BTC','ETC/ETH','XMR/USD','XMR/BTC','DASH/USD','DASH/BTC']
 
-#market=['$$$/BTC', '1337/BTC', '1ST/BTC', '1ST/ETH','1ST/USDT', '21M/BTC', '2GIVE/BTC', '300/BTC', '42/BTC', '4CHN/BTC', '611/BTC', '808/BTC', '888/BTC', '8BIT/BTC', '9COIN/BTC', 'ABC/BTC', 'ABY/BTC', 'AC/BTC', 'ACC/BTC', 'ACOIN/BTC', 'ACP/BTC', 'ADC/BTC', 'ADCN/BTC', 'ADL/BTC', 'ADST/BTC', 'ADT/BTC', 'ADT/ETH', 'ADX/BTC', 'ADX/ETH', 'ADX/USDT', 'AE/BTC', 'AE/ETH', 'AE/USDT', 'AEON/BTC', 'AGRS/BTC', 'AIB/BTC', 'ALEX/BTC', 'ALL/BTC', 'ALT/BTC', 'AMP/BTC', 'ANI/BTC', 'ANS/BTC', 'ANT/BTC', 'ANT/ETH', 'ANT/USDT', 'APC/BTC', 'APW/BTC', 'APX/BTC', 'ARC/BTC', 'ARCO/BTC', 'ARDR/BTC', 'ARG/BTC', 'ARGUS/BTC', 'ARI/BTC', 'ARK/BTC', 'ARK/USDT', 'ARV/BTC', 'ATH/BTC', 'ATMS/BTC', 'ATOM/BTC', 'AU/BTC', 'AUR/BTC', 'AURS/BTC', 'B3/BTC', 'B@/BTC', 'BASH/BTC', 'BAT/BTC', 'BAT/CNY', 'BAT/ETH', 'BAT/USDT', 'BAY/BTC', 'BBP/BTC', 'BCAP/BTC', 'BCAP/ETH', 'BCAP/USDT', 'BCC/BTC', 'BCC/CNY', 'BCC/ETH', 'BCC/USD', 'BCC/USDT', 'BCF/BTC', 'BCH/BTC', 'BCH/ETH', 'BCH/EUR', 'BCH/GBP', 'BCH/USD', 'BCH/USDT', 'BCH/XBT', 'BCN/BTC', 'BCU/BTC', 'BCU/USD', 'BCY/BTC', 'BDL/BTC', 'BEE/BTC', 'BEEZ/BTC', 'BENJI/BTC', 'BERN/BTC', 'BEST/BTC', 'BHC/BTC', 'BIOS/BTC', 'BIP/BTC', 'BITB/BTC', 'BITCF/BTC', 'BITS/BTC', 'BIZ/BTC', 'BKCAT/BTC', 'BLC/BTC', 'BLITZ/BTC', 'BLK/BTC', 'BLOCK/BTC', 'BMC/BTC', 'BMC/ETH', 'BMC/USDT', 'BNC/BTC', 'BNT/BTC', 'BNT/ETH', 'BNT/USDT', 'BNX/BTC', 'BOLI/BTC', 'BOP/BTC', 'BOPT/BTC', 'BOST/BTC', 'BQ/BTC', 'BRIT/BTC', 'BRK/BTC', 'BRO/BTC', 'BRX/BTC', 'BSD/BTC', 'BSD/USDT', 'BSDB/BTC', 'BSTY/BTC', 'BTA/BTC', 'BTB/BTC', 'BELA/BTC', 'BTCD/BTC', 'BTM/BTC', 'BTS/BTC', 'BURST/BTC', 'CLAM/BTC', 'BTC/CNY', 'CVC/BTC', 'DASH/BTC', 'DCR/BTC', 'DGB/BTC', 'DOGE/BTC', 'EMC2/BTC', 'ETC/BTC', 'ETH/BTC', 'BTC/EUR', 'EXP/BTC', 'FCT/BTC', 'FLDC/BTC', 'FLO/BTC', 'GAME/BTC', 'GAS/BTC', 'BTC/GBP', 'GNO/BTC', 'GNT/BTC', 'BTC/GOLD', 'GRC/BTC', 'HUC/BTC', 'LBC/BTC', 'LSK/BTC', 'LTC/BTC', 'MAID/BTC', 'NAUT/BTC', 'NAV/BTC', 'NEOS/BTC', 'NMC/BTC', 'NOTE/BTC', 'NXC/BTC', 'NXT/BTC', 'OMG/BTC', 'OMNI/BTC', 'PASC/BTC', 'PINK/BTC', 'POT/BTC', 'PPC/BTC', 'RADS/BTC']
-for pair in market:
-    if __name__ == "__main__":
-        import time
-    
-        # Function to be executed in a thread
-        ti = time.time()
-        # Instantiate a thread pool with 5 worker threads
-        pool = ThreadPool(20)
-    
-        # Add the jobs in bulk to the thread pool. Alternatively you could use
-        # `pool.add_task` to add single jobs. The code will block here, which
-        # makes it possible to cancel the thread pool with an exception when
-        # the currently running batch of workers is finished.
-        liste = []
-        for exchange in get_exchanges():
-            if(exchange!=None and int(exchange['exch_trade_enabled'])==1 ):
-                pool.add_task(get_ticker, exchange['exch_code'], pair,exchange['exch_fee'], liste)
-            else:
-                continue 
-        pool.wait_completion()
-        price=price_fee(liste)
-        cross_possibility=get_posibility(price)
-        cross_possibility=sorted(cross_possibility, key=itemgetter(2),reverse=True)
-        all_list.append(cross_possibility) 
+
+if __name__ == "__main__":
+    #,'ETH/BTC','LTC/USD','LTC/BTC','ETC/BTC','ETC/ETH','XMR/USD','XMR/BTC','DASH/USD','DASH/BTC']
+    #market=['$$$/BTC', '1337/BTC', '1ST/BTC', '1ST/ETH','1ST/USDT', '21M/BTC', '2GIVE/BTC', '300/BTC', '42/BTC', '4CHN/BTC', '611/BTC', '808/BTC', '888/BTC', '8BIT/BTC', '9COIN/BTC', 'ABC/BTC', 'ABY/BTC', 'AC/BTC', 'ACC/BTC', 'ACOIN/BTC', 'ACP/BTC', 'ADC/BTC', 'ADCN/BTC', 'ADL/BTC', 'ADST/BTC', 'ADT/BTC', 'ADT/ETH', 'ADX/BTC', 'ADX/ETH', 'ADX/USDT', 'AE/BTC', 'AE/ETH', 'AE/USDT', 'AEON/BTC', 'AGRS/BTC', 'AIB/BTC', 'ALEX/BTC', 'ALL/BTC', 'ALT/BTC', 'AMP/BTC', 'ANI/BTC', 'ANS/BTC', 'ANT/BTC', 'ANT/ETH', 'ANT/USDT', 'APC/BTC', 'APW/BTC', 'APX/BTC', 'ARC/BTC', 'ARCO/BTC', 'ARDR/BTC', 'ARG/BTC', 'ARGUS/BTC', 'ARI/BTC', 'ARK/BTC', 'ARK/USDT', 'ARV/BTC', 'ATH/BTC', 'ATMS/BTC', 'ATOM/BTC', 'AU/BTC', 'AUR/BTC', 'AURS/BTC', 'B3/BTC', 'B@/BTC', 'BASH/BTC', 'BAT/BTC', 'BAT/CNY', 'BAT/ETH', 'BAT/USDT', 'BAY/BTC', 'BBP/BTC', 'BCAP/BTC', 'BCAP/ETH', 'BCAP/USDT', 'BCC/BTC', 'BCC/CNY', 'BCC/ETH', 'BCC/USD', 'BCC/USDT', 'BCF/BTC', 'BCH/BTC', 'BCH/ETH', 'BCH/EUR', 'BCH/GBP', 'BCH/USD', 'BCH/USDT', 'BCH/XBT', 'BCN/BTC', 'BCU/BTC', 'BCU/USD', 'BCY/BTC', 'BDL/BTC', 'BEE/BTC', 'BEEZ/BTC', 'BENJI/BTC', 'BERN/BTC', 'BEST/BTC', 'BHC/BTC', 'BIOS/BTC', 'BIP/BTC', 'BITB/BTC', 'BITCF/BTC', 'BITS/BTC', 'BIZ/BTC', 'BKCAT/BTC', 'BLC/BTC', 'BLITZ/BTC', 'BLK/BTC', 'BLOCK/BTC', 'BMC/BTC', 'BMC/ETH', 'BMC/USDT', 'BNC/BTC', 'BNT/BTC', 'BNT/ETH', 'BNT/USDT', 'BNX/BTC', 'BOLI/BTC', 'BOP/BTC', 'BOPT/BTC', 'BOST/BTC', 'BQ/BTC', 'BRIT/BTC', 'BRK/BTC', 'BRO/BTC', 'BRX/BTC', 'BSD/BTC', 'BSD/USDT', 'BSDB/BTC', 'BSTY/BTC', 'BTA/BTC', 'BTB/BTC', 'BELA/BTC', 'BTCD/BTC', 'BTM/BTC', 'BTS/BTC', 'BURST/BTC', 'CLAM/BTC', 'BTC/CNY', 'CVC/BTC', 'DASH/BTC', 'DCR/BTC', 'DGB/BTC', 'DOGE/BTC', 'EMC2/BTC', 'ETC/BTC', 'ETH/BTC', 'BTC/EUR', 'EXP/BTC', 'FCT/BTC', 'FLDC/BTC', 'FLO/BTC', 'GAME/BTC', 'GAS/BTC', 'BTC/GBP', 'GNO/BTC', 'GNT/BTC', 'BTC/GOLD', 'GRC/BTC', 'HUC/BTC', 'LBC/BTC', 'LSK/BTC', 'LTC/BTC', 'MAID/BTC', 'NAUT/BTC', 'NAV/BTC', 'NEOS/BTC', 'NMC/BTC', 'NOTE/BTC', 'NXC/BTC', 'NXT/BTC', 'OMG/BTC', 'OMNI/BTC', 'PASC/BTC', 'PINK/BTC', 'POT/BTC', 'PPC/BTC', 'RADS/BTC']
+    #print(len(market))
+    market=['BTC/USD','ETH/USD']
+    import time
         
-write_csv(market,all_list)
-print("Time of execution : " +str(time.time()-ti))
+    # Function to be executed in a thread
+    ti = time.time()
+    # Instantiate a thread pool with 5 worker threads
+    pool = ThreadPool(40)
+
+    # On boucle 3 fois les paires
+    for i in range(3):
+        all_list=[]
+        for pair in market:
+            
+            liste = []
+            
+            for exchange in get_exchanges():
+                if(exchange!=None and int(exchange['exch_trade_enabled'])==1 ):
+                    pool.add_task(get_ticker, exchange['exch_code'], pair,exchange['exch_fee'], liste)
+                else:
+                    continue 
+            pool.wait_completion()
+            price=price_fee(liste)
+            cross_possibility=get_posibility(price)
+            cross_possibility=sorted(cross_possibility, key=itemgetter(2),reverse=True)
+            all_list.append(cross_possibility) 
+            
+        write_csv(market,all_list)
+        print("Time of execution : " +str(time.time()-ti))
