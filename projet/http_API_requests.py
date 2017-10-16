@@ -192,7 +192,7 @@ def add_order(auth_id,exch_id,mkt_id,order_type_id,price_type_id,limit_price,ord
            'X-API-SECRET': API_SECRET
            }
     request = requests.request('POST','https://api.coinigy.com/api/v1/addOrder', data=values, headers=headers)
-    print(request.json())
+    return request.json()['data']['internal_order_id']
 
 def get_order():
     headers = {
@@ -216,7 +216,17 @@ def liste_pair(): # return all trading pair in the market
         if(i['mkt_name'] not in liste and i['exch_id'] in liste_id):
             append(i['mkt_name'])
     return liste
-    
+
+def confirmation_order(order_id, timestamp):
+    condition = False
+    while(condition== False and time.time()-timestamp < 10):
+        book_order = get_order()
+        for order in book_order['order_history']:
+            if(int(order['order_id'])==order_id):
+                print('ok')
+                if(order['order_status']=='Executed'):
+                    condition = True
+    return condition
 
         ##############################################################################
         #                                                                            #

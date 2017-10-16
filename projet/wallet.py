@@ -5,8 +5,8 @@ Created on Tue Oct  3 13:18:24 2017
 @author: Antoine Vaugeois
 """
 
-from http_API_requests import get_accounts,get_balances,get_markets,add_order,get_order,get_one_ticker,get_balances2,price
-
+from http_API_requests import get_accounts,get_balances,get_markets,add_order,get_order,get_one_ticker,get_balances2,price, confirmation_order
+import time
 #match exchange name and index COINIGY
 plateforme={'Bitstamp': 'BITS','Cryptopia':'CPIA','Global Digital Asset Exchange':'GDAE','VBTC':'VBTC','Liqui.io':'LIQU' ,'OKCoin': 'OK', 'Bter': 'BTER','Bitfinex':'BITF','BTC China':'BTCC','Kraken':'KRKN','Poloniex':'PLNX','C-Cex':'CCEX','Huobi':'HUOB','Bittrex':'BTRX','CEX.IO':'CXIO'}
 crypto=['BTC','ETH','LTC']
@@ -52,15 +52,17 @@ def get_money():
     return money
         
 
-print(get_money())
+
 #print(get_parameters('ETH/USD'))
 #print(get_balances('122758'))
 #print(get_accounts())
+print(get_order())
+"""order_id = int(add_order('122758','7','2514','2','3','100','0.001'))
+print(order_id)
+print("##################################################")
+print(confirmation_order(16866, time.time()))
 
-#print(add_order('122758','7','2514','1','3','293.74','0.010'))
-#print(get_order())
-
-#print(limit_price_sell('BITF','USD/ETH'))
+#print(limit_price_sell('BITF','USD/ETH'))"""
 
 
 
