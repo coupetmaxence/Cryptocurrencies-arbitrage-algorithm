@@ -11,6 +11,23 @@ from threading import Thread
 import sys
 import time
 
+        ##############################################################################
+        #                                                                            #
+        #                API From Coinigy                                            #
+        #                                                                            #
+        #                                                                            #
+        #                                                                            #
+        #                                                                            #
+        #                                                                            #
+        #                                                                            #                        
+        #                                                                            #
+        #                                                                            #
+        #                                                                            #
+        #                                                                            #
+        ##############################################################################
+
+
+
 API_KEY = 'adb5c86ce88027364f31865757f80e1f'
 API_SECRET = '77dddd1ad76cb3d08bbe67f4883521c4'
 
@@ -130,6 +147,15 @@ def get_balances(auth_ids):
     request = requests.request('POST','https://api.coinigy.com/api/v1/balances', data=values, headers=headers)
     json_data=request.json()['data']
     return json_data
+def get_balances2():
+    headers = {
+            'Content-Type': 'application/json',
+            'X-API-KEY': API_KEY,
+            'X-API-SECRET': API_SECRET
+            }
+    request = requests.request('POST','https://api.coinigy.com/api/v1/balances', headers=headers)
+    json_data=request.json()['data']
+    return json_data
 
 
         ##############################################################################
@@ -191,4 +217,26 @@ def liste_pair(): # return all trading pair in the market
             append(i['mkt_name'])
     return liste
     
-        
+
+        ##############################################################################
+        #                                                                            #
+        #                API From CoinMarketCap                                      #
+        #                                                                            #
+        #                                                                            #
+        #                                                                            #
+        #                                                                            #
+        #                                                                            #
+        #                                                                            #                        
+        #                                                                            #
+        #                                                                            #
+        #                                                                            #
+        #                                                                            #
+        ##############################################################################
+
+def price():
+    request = requests.request('GET','https://api.coinmarketcap.com/v1/ticker/')
+    return request.json()
+
+
+
+
