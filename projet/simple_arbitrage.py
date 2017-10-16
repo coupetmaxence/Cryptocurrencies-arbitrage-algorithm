@@ -17,9 +17,9 @@ def price_fee(liste): # return the following list [exchange,bis,ask,timestamp,vo
     price=[]
     append=price.append
     for i in range (len(liste)):
-        tmpb=float(liste[i][3])-float(liste[i][3])*float(liste[i][2])
-        tmph=float(liste[i][4])+float(liste[i][4])*float(liste[i][2])
-        append([liste[i][0],tmpb,tmph,liste[i][6],liste[i][5],liste[i][7]])
+         tmpb=float(liste[i][3])-float(liste[i][3])*float(liste[i][2])
+         tmph=float(liste[i][4])+float(liste[i][4])*float(liste[i][2])
+         append([liste[i][0],tmpb,tmph,liste[i][6],liste[i][5],liste[i][7]])
     return price
 
 def get_posibility(price): # return the following list [timestamp,exchange A/B,yield,volumeA,volumeB,spreadA,spreadB]
@@ -33,7 +33,7 @@ def get_posibility(price): # return the following list [timestamp,exchange A/B,y
                 rendement=((price[j][1]-price[i][2])/price[j][1])*100
                 volumeA=price[i][4]
                 volumeB=price[j][4]
-                if(volumeA!=0 and volumeB!=0):
+                if(float(volumeA)>0 and float(volumeB)>0):
                     append([date,plateforme,rendement,volumeA,volumeB,price[i][5],price[j][5]])
     return liste
 
