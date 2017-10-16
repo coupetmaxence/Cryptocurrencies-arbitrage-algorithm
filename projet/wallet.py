@@ -43,7 +43,7 @@ def price_type_id():
     return 0
 
 
-#print(get_parameters('ETH/USD'))
+print(get_parameters('ETH/USD'))
 #print(get_balances('122758'))
 #print(get_accounts())
 
