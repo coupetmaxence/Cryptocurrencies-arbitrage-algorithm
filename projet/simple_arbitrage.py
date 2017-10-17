@@ -33,7 +33,7 @@ def get_posibility(price): # return the following list [timestamp,exchange A/B,y
                 rendement=((price[j][1]-price[i][2])/price[j][1])*100
                 volumeA=price[i][4]
                 volumeB=price[j][4]
-                if(float(volumeA)>0 and float(volumeB)>0):
+                if(float(volumeA)>0 and float(volumeB)>0 and float(rendement)>0):
                     append([date,plateforme,rendement,volumeA,volumeB,price[i][5],price[j][5]])
     return liste
 
