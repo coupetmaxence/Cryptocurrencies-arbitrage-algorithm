@@ -132,6 +132,7 @@ if __name__ == "__main__":
             price=price_fee(liste)
             cross_possibility=get_posibility(price)
             cross_possibility=sorted(cross_possibility, key=itemgetter(2),reverse=True)
+            
             all_list.append(cross_possibility) 
         write_csv(market,all_list)
         if(time.time()-t<60):
