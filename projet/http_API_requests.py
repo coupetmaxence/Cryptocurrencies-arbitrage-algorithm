@@ -192,7 +192,10 @@ def add_order(auth_id,exch_id,mkt_id,order_type_id,price_type_id,limit_price,ord
            'X-API-SECRET': API_SECRET
            }
     request = requests.request('POST','https://api.coinigy.com/api/v1/addOrder', data=values, headers=headers)
-    return request.json()['data']['internal_order_id']
+    order_id = request.json()['data']['internal_order_id']
+    confirmation = confirmation_order(order_id, time.time())
+    return confirmation, order_id
+        
 
 def get_order():
     headers = {
