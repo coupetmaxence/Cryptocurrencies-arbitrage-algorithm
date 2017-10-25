@@ -26,8 +26,6 @@ import time
         #                                                                            #
         ##############################################################################
 
-"""API_KEY = "5320d6b526c11b208e080eebda4f48f0"
-API_SECRET = "54fd25bd7fb901099b74dcbed4f8dc0e""""
 
 lines = [line.rstrip('\n') for line in open('API_KEY.password')]
 API_KEY = lines[0]
