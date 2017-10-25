@@ -39,3 +39,7 @@ def moove_consequences(exchange, market, volume, order_type):
 
 
 print(moove_consequences("BTER", "BTC/CNY", 1, "BUY"))
+
+with open('API_KEY.password') as f:
+    read_data = f.read()
+    print(read_data)
