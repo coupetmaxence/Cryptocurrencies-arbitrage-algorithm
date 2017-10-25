@@ -207,6 +207,24 @@ def get_order():
     json_data=request.json()['data']
     return json_data
 
+def get_order_book(exchange, market):
+    values = """
+    {
+         "exchange_code": """+'"'+exchange+'"'+""",
+         "exchange_market": """+'"'+market+'"'+""",
+         "type": "orders"
+    }
+    """
+    headers = {
+           'Content-Type': 'application/json',
+           'X-API-KEY': API_KEY,
+           'X-API-SECRET': API_SECRET
+           }
+    request = requests.request('POST','https://api.coinigy.com/api/v1/data', data=values, headers=headers)
+    json_data=request.json()['data']
+    return json_data
+
+
 def liste_pair(): # return all trading pair in the market
     liste_id=[]
     append=liste_id.append
@@ -230,6 +248,8 @@ def confirmation_order(order_id, timestamp):
                 if(order['order_status']=='Executed'):
                     condition = True
     return condition
+
+
 
         ##############################################################################
         #                                                                            #
