@@ -38,4 +38,4 @@ def moove_consequences(exchange, market, volume, order_type):
     
 
 
-print(moove_consequences("BITF", "BTC/USD", 100, "SELL"))
+print(moove_consequences("BTER", "BTC/CNY", 1, "BUY"))
