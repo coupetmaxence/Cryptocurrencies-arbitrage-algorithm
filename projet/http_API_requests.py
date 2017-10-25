@@ -26,10 +26,15 @@ import time
         #                                                                            #
         ##############################################################################
 
+"""API_KEY = "5320d6b526c11b208e080eebda4f48f0"
+API_SECRET = "54fd25bd7fb901099b74dcbed4f8dc0e""""
+
+lines = [line.rstrip('\n') for line in open('API_KEY.password')]
+API_KEY = lines[0]
+API_SECRET = lines[1]
 
 
-API_KEY = 'adb5c86ce88027364f31865757f80e1f'
-API_SECRET = '77dddd1ad76cb3d08bbe67f4883521c4'
+
 
 def get_exchanges():
     try:
@@ -221,6 +226,7 @@ def get_order_book(exchange, market):
            'X-API-SECRET': API_SECRET
            }
     request = requests.request('POST','https://api.coinigy.com/api/v1/data', data=values, headers=headers)
+    print(request.json())
     json_data=request.json()['data']
     return json_data
 
