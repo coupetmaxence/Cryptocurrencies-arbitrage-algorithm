@@ -13,7 +13,7 @@ from thread_pooling import ThreadPool
 from http_API_requests import get_exchanges, get_ticker
 
 
-def price_fee(liste): # return the following list [exchange,bis,ask,timestamp,volume,spread] with the fee apply to the bid and the ask
+def price_fee(liste): # return the following list [exchange,bid,ask,timestamp,volume,spread] with the fee apply to the bid and the ask
     price=[]
     append=price.append
     for i in range (len(liste)):
@@ -33,7 +33,7 @@ def get_posibility(price): # return the following list [timestamp,exchange A/B,y
                 rendement=((price[j][1]-price[i][2])/price[j][1])*100
                 volumeA=price[i][4]
                 volumeB=price[j][4]
-                if(float(volumeA)>0 and float(volumeB)>0 and float(rendement)>0):
+                if(float(volumeA)>0 and float(volumeB)>0 and float(rendement)>0 and float(rendement)<20):
                     append([date,plateforme,rendement,volumeA,volumeB,price[i][5],price[j][5]])
     return liste
 
