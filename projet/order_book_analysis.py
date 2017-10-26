@@ -107,5 +107,6 @@ def visualize_order_book(exchange, market):
     plt.hist(liste)
     plt.show()
     
+visualize_order_book("BITF","BTC/USD")
 
 

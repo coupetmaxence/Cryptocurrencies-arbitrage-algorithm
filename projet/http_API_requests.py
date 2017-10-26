@@ -269,7 +269,7 @@ def confirmation_order(order_id, timestamp):
         #                                                                            #
         ##############################################################################
 
-def price():
+def prices():
     request = requests.request('GET','https://api.coinmarketcap.com/v1/ticker/')
     return request.json()
 

@@ -10,16 +10,22 @@ import os
 import openpyxl 
 from operator import itemgetter
 from thread_pooling import ThreadPool
-from http_API_requests import get_exchanges, get_ticker
+from http_API_requests import get_exchanges, get_ticker, prices
 
 
 def price_fee(liste): # return the following list [exchange,bid,ask,timestamp,volume,spread] with the fee apply to the bid and the ask
     price=[]
     append=price.append
     for i in range (len(liste)):
-         tmpb=float(liste[i][3])-float(liste[i][3])*float(liste[i][2])
-         tmph=float(liste[i][4])+float(liste[i][4])*float(liste[i][2])
-         append([liste[i][0],tmpb,tmph,liste[i][6],liste[i][5],liste[i][7]])
+        bid=float(liste[i][3])-float(liste[i][3])*float(liste[i][2])
+        ask=float(liste[i][4])+float(liste[i][4])*float(liste[i][2])
+        crypto=pair[0:pair.find('/',2)]
+        value=0
+        for tmp in prices():
+           if(tmp['symbol']==crypto):
+               value=tmp['price_usd']
+        usd_volume=float(liste[i][5])*float(value)
+        append([liste[i][0],bid,ask,liste[i][6],usd_volume,liste[i][7]])
     return price
 
 def get_posibility(price): # return the following list [timestamp,exchange A/B,yield,volumeA,volumeB,spreadA,spreadB]
@@ -116,13 +122,11 @@ if __name__ == "__main__":
     pool = ThreadPool(30)
 
     # On boucle 3 fois les paires
-    for i in range(1):
+    for i in range(5):
         t=time.time()
         all_list=[]
         for pair in market:
-            
             liste = []
-            
             for exchange in get_exchanges():
                 if(exchange!=None and int(exchange['exch_trade_enabled'])==1 ):
                     pool.add_task(get_ticker, exchange['exch_code'], pair,exchange['exch_fee'], liste)
@@ -136,6 +140,6 @@ if __name__ == "__main__":
             all_list.append(cross_possibility) 
         write_csv(market,all_list)
         if(time.time()-t<60):
-            print("je dors pendant :"+str(60-time.time()+t)+" s")
-            time.sleep(60-time.time()+t)
+           print("I sleep during :"+str(60-time.time()+t)+" s")
+           time.sleep(60-time.time()+t)
         print("Time of execution : " +str(time.time()-ti))
