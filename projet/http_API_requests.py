@@ -224,7 +224,6 @@ def get_order_book(exchange, market):
            'X-API-SECRET': API_SECRET
            }
     request = requests.request('POST','https://api.coinigy.com/api/v1/data', data=values, headers=headers)
-    print(request.json())
     json_data=request.json()['data']
     return json_data
 
