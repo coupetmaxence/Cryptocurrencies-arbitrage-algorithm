@@ -11,6 +11,9 @@ import time
 plateforme={'Bitstamp': 'BITS','Cryptopia':'CPIA','Global Digital Asset Exchange':'GDAE','VBTC':'VBTC','Liqui.io':'LIQU' ,'OKCoin': 'OK', 'Bter': 'BTER','Bitfinex':'BITF','BTC China':'BTCC','Kraken':'KRKN','Poloniex':'PLNX','C-Cex':'CCEX','Huobi':'HUOB','Bittrex':'BTRX','CEX.IO':'CXIO'}
 crypto=['BTC','ETH','LTC']
 
+
+
+
 def get_parameters(pair):
     parameters=[]
     append=parameters.append
