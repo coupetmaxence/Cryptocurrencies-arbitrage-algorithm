@@ -27,7 +27,7 @@ import time
         ##############################################################################
 
 
-lines = [line.rstrip('\n') for line in open('API_KEY.password')]
+lines = [line.rstrip('\n') for line in open('src/API_KEY.password')]
 API_KEY = lines[0]
 API_SECRET = lines[1]
 
