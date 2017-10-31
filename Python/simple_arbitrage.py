@@ -37,7 +37,10 @@ def get_posibility(price): # return the following list [timestamp,exchange A/B,y
         for j in range (0,len(price)) :
             if(i!=j and price[i][1]<price[j][1]): # we need to compare the bid (it's a choice you can do the same think with the ask)
                 date=price[i][3]
-                plateforme=price[i][0]+"/"+price[j][0]
+                plateforme=price[i][0]+"/"+price[j][0] #We buy on j and sell on i
+                fee = 0.003
+                real_yield = ((price[j][1]-price[i][2])/price[j][1]- fee*(price[i][5]+price[j][5])/price[j][1])*100
+                
                 rendement=((price[j][1]-price[i][2])/price[j][1])*100
                 volumeA=price[i][4]
                 volumeB=price[j][4]
@@ -123,7 +126,7 @@ if __name__ == "__main__":
     pool = ThreadPool(30)
 
     # On boucle 3 fois les paires
-    for i in range(1):
+    for i in range(5):
         t=time.time()
         all_list=[]
         for pair in market:
@@ -137,8 +140,9 @@ if __name__ == "__main__":
             price=price_fee(liste)
             cross_possibility=get_posibility(price)
             cross_possibility=sorted(cross_possibility, key=itemgetter(2),reverse=True)
-            
+
             all_list.append(cross_possibility) 
+            
         write_csv(market,all_list)
         if(time.time()-t<60):
            print("I sleep during :"+str(60-time.time()+t)+" s")
