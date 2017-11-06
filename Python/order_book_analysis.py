@@ -62,7 +62,7 @@ def order_book_analysis(exchange, market):
                     bid_walls.append(orders[i]['price'])
     return bid_walls, ask_walls
 
-#print(order_book_analysis("BTER", "BTC/CNY"))
+#print(order_book_analysis("BITF", "LTC/USD"))
         
     
 
@@ -97,7 +97,7 @@ def variation(exchange, market, volume):
     sell_moove = moove_consequences(exchange, market, volume, "SELL")[3]
     return 100*(buy_moove - sell_moove)/buy_moove
 
-print(moove_consequences("KRKN", "LTC/USD", 17, "BUY"))
+print(variation("BITF", "LTC/USD", 17))
 
 def visualize_order_book(exchange, market):
     order_book_data = get_order_book(exchange, market)
@@ -107,6 +107,6 @@ def visualize_order_book(exchange, market):
     plt.hist(liste)
     plt.show()
     
-visualize_order_book("BITF","BTC/USD")
+#visualize_order_book("BITF","BTC/USD")
 
 
