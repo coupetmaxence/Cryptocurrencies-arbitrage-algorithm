@@ -97,7 +97,7 @@ def variation(exchange, market, volume):
     sell_moove = moove_consequences(exchange, market, volume, "SELL")[3]
     return 100*(buy_moove - sell_moove)/buy_moove
 
-print(len(get_order_book("BITF", "BTC/USD")['bids']))
+print(get_order_book("KRKN", "USD/XBT")['bids'])
 
 def visualize_order_book(exchange, market):
     order_book_data = get_order_book(exchange, market)
