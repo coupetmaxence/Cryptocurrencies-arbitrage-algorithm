@@ -7,7 +7,7 @@ Created on Wed Oct 25 14:02:50 2017
 
 
 from thread_pooling import ThreadPool
-from http_API_requests import get_exchanges, get_ticker, get_order_book
+from http_API_requests import get_exchanges, get_ticker, get_order_book, get_markets
 import sqlite3
 import time
 import matplotlib.pyplot as plt
@@ -97,7 +97,7 @@ def variation(exchange, market, volume):
     sell_moove = moove_consequences(exchange, market, volume, "SELL")[3]
     return 100*(buy_moove - sell_moove)/buy_moove
 
-print(variation("BITF", "LTC/USD", 17))
+print(len(get_order_book("BITF", "BTC/USD")['bids']))
 
 def visualize_order_book(exchange, market):
     order_book_data = get_order_book(exchange, market)
