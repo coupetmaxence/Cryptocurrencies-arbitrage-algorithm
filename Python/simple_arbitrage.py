@@ -45,7 +45,7 @@ def get_posibility(price): # return the following list [timestamp,exchange A/B,y
                 volumeA=price[i][4]
                 volumeB=price[j][4]
                 if(float(rendement)>0 and float(rendement)<20):
-                    append([date,plateforme,real_yield,volumeA,volumeB,price[i][5],price[j][5]])
+                    append([date,plateforme,rendement,volumeA,volumeB,price[i][5],price[j][5]])
     return liste
 
 def write_csv(market,liste):
