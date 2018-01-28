@@ -7,6 +7,7 @@ Created on Tue Sep 26 16:50:23 2017
 import xlsxwriter
 import xlrd
 import os
+import time
 import openpyxl 
 from operator import itemgetter
 from thread_pooling import ThreadPool
@@ -14,7 +15,7 @@ from http_API_requests import get_exchanges, get_ticker, prices
 
 
 
-def price_fee(liste): # return the following list [exchange,bid,ask,timestamp,volume,spread] with the fee apply to the bid and the ask
+def price_fee(liste,pair): # return the following list [exchange,bid,ask,timestamp,volume,spread] with the fee apply to the bid and the ask
     price=[]
     append=price.append
     for i in range (len(liste)):
@@ -33,9 +34,10 @@ def price_fee(liste): # return the following list [exchange,bid,ask,timestamp,vo
 def get_posibility(price): # return the following list [timestamp,exchange A/B,yield,volumeA,volumeB,spreadA,spreadB]
     liste=[] 
     append=liste.append
+    plt=["BITS","CXIO","BITF"]
     for i in range (0,len(price)) :
         for j in range (0,len(price)) :
-            if(i!=j and price[i][1]<price[j][1]): # we need to compare the bid (it's a choice you can do the same think with the ask)
+            if(i!=j and price[i][1]<price[j][1] and (price[i][0] in plt) and(price[j][0] in plt)): # we need to compare the bid (it's a choice you can do the same think with the ask)
                 date=price[i][3]
                 plateforme=price[i][0]+"/"+price[j][0] #We buy on j and sell on i
                 fee = 0.003
@@ -86,6 +88,9 @@ def write_csv(market,liste):
         for j in liste:
             pair=market[index_market]
             worksheet=wb.add_worksheet(pair.replace("/","_"))
+            worksheet.set_column(0, 0,25)
+            worksheet.set_column(0, 1,15)
+            worksheet.set_column(0, 2,10)
             worksheet.write(0,0,'Date',bold)
             worksheet.write(0,1,'Plateforme A/B',bold)
             worksheet.write(0,2,'Rendement',bold)
@@ -111,14 +116,35 @@ def write_csv(market,liste):
                 worksheet.write_number(index,5,f)
                 worksheet.write_number(index,6,g) 
                 index+=1
-    
+def get_yield(market):   
+      
+    # Function to be executed in a thread
+    # Instantiate a thread pool with 5 worker threads
+    pool = ThreadPool(30)
+    all_list=[]
+    for pair in market:
+        liste = []
+        for exchange in get_exchanges():
+            if(exchange!=None and int(exchange['exch_trade_enabled'])==1 ):
+                pool.add_task(get_ticker, exchange['exch_code'], pair,exchange['exch_fee'], liste)
+            else:
+                continue 
+        pool.wait_completion()
+        price=price_fee(liste,pair)
+        cross_possibility=get_posibility(price)
+        cross_possibility=sorted(cross_possibility, key=itemgetter(2),reverse=True)
+        
+        all_list.append(cross_possibility)
+    return all_list
+   
+
 
 
 if __name__ == "__main__":
     #,'ETH/BTC','LTC/USD','LTC/BTC','ETC/BTC','ETC/ETH','XMR/USD','XMR/BTC','DASH/USD','DASH/BTC']
     #market=['$$$/BTC', '1337/BTC', '1ST/BTC', '1ST/ETH','1ST/USDT', '21M/BTC', '2GIVE/BTC', '300/BTC', '42/BTC', '4CHN/BTC', '611/BTC', '808/BTC', '888/BTC', '8BIT/BTC', '9COIN/BTC', 'ABC/BTC', 'ABY/BTC', 'AC/BTC', 'ACC/BTC', 'ACOIN/BTC', 'ACP/BTC', 'ADC/BTC', 'ADCN/BTC', 'ADL/BTC', 'ADST/BTC', 'ADT/BTC', 'ADT/ETH', 'ADX/BTC', 'ADX/ETH', 'ADX/USDT', 'AE/BTC', 'AE/ETH', 'AE/USDT', 'AEON/BTC', 'AGRS/BTC', 'AIB/BTC', 'ALEX/BTC', 'ALL/BTC', 'ALT/BTC', 'AMP/BTC', 'ANI/BTC', 'ANS/BTC', 'ANT/BTC', 'ANT/ETH', 'ANT/USDT', 'APC/BTC', 'APW/BTC', 'APX/BTC', 'ARC/BTC', 'ARCO/BTC', 'ARDR/BTC', 'ARG/BTC', 'ARGUS/BTC', 'ARI/BTC', 'ARK/BTC', 'ARK/USDT', 'ARV/BTC', 'ATH/BTC', 'ATMS/BTC', 'ATOM/BTC', 'AU/BTC', 'AUR/BTC', 'AURS/BTC', 'B3/BTC', 'B@/BTC', 'BASH/BTC', 'BAT/BTC', 'BAT/CNY', 'BAT/ETH', 'BAT/USDT', 'BAY/BTC', 'BBP/BTC', 'BCAP/BTC', 'BCAP/ETH', 'BCAP/USDT', 'BCC/BTC', 'BCC/CNY', 'BCC/ETH', 'BCC/USD', 'BCC/USDT', 'BCF/BTC', 'BCH/BTC', 'BCH/ETH', 'BCH/EUR', 'BCH/GBP', 'BCH/USD', 'BCH/USDT', 'BCH/XBT', 'BCN/BTC', 'BCU/BTC', 'BCU/USD', 'BCY/BTC', 'BDL/BTC', 'BEE/BTC', 'BEEZ/BTC', 'BENJI/BTC', 'BERN/BTC', 'BEST/BTC', 'BHC/BTC', 'BIOS/BTC', 'BIP/BTC', 'BITB/BTC', 'BITCF/BTC', 'BITS/BTC', 'BIZ/BTC', 'BKCAT/BTC', 'BLC/BTC', 'BLITZ/BTC', 'BLK/BTC', 'BLOCK/BTC', 'BMC/BTC', 'BMC/ETH', 'BMC/USDT', 'BNC/BTC', 'BNT/BTC', 'BNT/ETH', 'BNT/USDT', 'BNX/BTC', 'BOLI/BTC', 'BOP/BTC', 'BOPT/BTC', 'BOST/BTC', 'BQ/BTC', 'BRIT/BTC', 'BRK/BTC', 'BRO/BTC', 'BRX/BTC', 'BSD/BTC', 'BSD/USDT', 'BSDB/BTC', 'BSTY/BTC', 'BTA/BTC', 'BTB/BTC', 'BELA/BTC', 'BTCD/BTC', 'BTM/BTC', 'BTS/BTC', 'BURST/BTC', 'CLAM/BTC', 'BTC/CNY', 'CVC/BTC', 'DASH/BTC', 'DCR/BTC', 'DGB/BTC', 'DOGE/BTC', 'EMC2/BTC', 'ETC/BTC', 'ETH/BTC', 'BTC/EUR', 'EXP/BTC', 'FCT/BTC', 'FLDC/BTC', 'FLO/BTC', 'GAME/BTC', 'GAS/BTC', 'BTC/GBP', 'GNO/BTC', 'GNT/BTC', 'BTC/GOLD', 'GRC/BTC', 'HUC/BTC', 'LBC/BTC', 'LSK/BTC', 'LTC/BTC', 'MAID/BTC', 'NAUT/BTC', 'NAV/BTC', 'NEOS/BTC', 'NMC/BTC', 'NOTE/BTC', 'NXC/BTC', 'NXT/BTC', 'OMG/BTC', 'OMNI/BTC', 'PASC/BTC', 'PINK/BTC', 'POT/BTC', 'PPC/BTC', 'RADS/BTC']
-    market=['BTC/USD','ETH/USD','ETH/BTC','LTC/USD']
-    import time
+    
+    market=['BTC/EUR','BTC/USD','ETH/USD','ETH/BTC','LTC/USD','NEO/USD']
         
     # Function to be executed in a thread
     ti = time.time()
@@ -137,7 +163,8 @@ if __name__ == "__main__":
                 else:
                     continue 
             pool.wait_completion()
-            price=price_fee(liste)
+            print(liste)
+            price=price_fee(liste,pair)
             cross_possibility=get_posibility(price)
             cross_possibility=sorted(cross_possibility, key=itemgetter(2),reverse=True)
 
