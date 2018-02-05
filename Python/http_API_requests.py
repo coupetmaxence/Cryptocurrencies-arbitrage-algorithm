@@ -77,6 +77,7 @@ def get_one_ticker(exchange, market):
     except:
         return 0
     
+    
 def get_exchanges():
     try:
         headers = {
@@ -192,6 +193,7 @@ def get_balances2():
     return json_data
 
 
+
         ##############################################################################
         #                 Parameters for add_order                                   #
         #                                                                            #
@@ -283,8 +285,7 @@ def confirmation_order(order_id, timestamp):
                 if(order['order_status']=='Executed'):
                     condition = True
     return condition
-
-
+"""
 def background_transfer(crypto,plateformA,plateformB,volume):
     dictionnary=get_dictionnary()
     if(volume<dictionnary[plateformA][crypto][2] or dictionnary[plateformA][crypto][2]==-1):
@@ -292,36 +293,51 @@ def background_transfer(crypto,plateformA,plateformB,volume):
         tmp=[]
         append=tmp.append
         for key,value in dictionnary[plateformA].items():
+            
             if(key!=crypto):
                 exch_fee=0
                 for exchanges in get_exchanges():
                     if(exchanges['exch_name']==plateformA):
                         exch_fee+=float(exchanges['exch_fee'])
+                        
                 ticker=get_one_ticker(plateforme[plateformA],crypto+"/"+key)
-                fee=volume*float(ticker[0]['bid'])*float(exch_fee)
-                tmp_costA=volume*float(ticker[0]['bid'])-fee-(float(ticker[0]['ask'])-float(ticker[0]['bid']))
-                costA=tmp_costA-value[0]*tmp_costA-value[1] #prix de sortie de A ce qui arrive sur B        
-                append([key,costA])
+                if(ticker!=0):  
+              
+                    fee=volume*float(ticker[0]['bid'])*float(exch_fee)
+                    tmp_costA=volume*float(ticker[0]['bid'])-fee-(float(ticker[0]['ask'])-float(ticker[0]['bid']))
+                    costA=tmp_costA-value[0]*tmp_costA-value[1] #prix de sortie de A ce qui arrive sur B        
+                    append([key,costA])
+              
             else:
                 foo=1
         not_direct=min(tmp,key=itemgetter(1))
         exch_fee=0
+        
         for exchanges in get_exchanges():
             if(exchanges['exch_name']==plateformB):
                 exch_fee+=float(exchanges['exch_fee'])    
                 break      
+            
+            
+        print(plateforme[plateformB],crypto+"/"+not_direct[0])
+        
+        
         ticker=get_one_ticker(plateforme[plateformB],crypto+"/"+not_direct[0])
         fee=0
-        if(float(ticker[0]['bid'])!=0):
-            fee+=not_direct[1]*(1/float(ticker[0]['bid']))*float(exch_fee)
-        tmp_cost=not_direct[1]*(1/float(ticker[0]['bid']))-fee
         
-        coast_total=tmp_cost-((1/float(ticker[0]['ask']))-(1/float(ticker[0]['bid'])))
+        if(ticker!=0):
+            if(float(ticker[0]['bid'])!=0):
+                fee+=not_direct[1]*(1/float(ticker[0]['bid']))*float(exch_fee)
+                tmp_cost=not_direct[1]*(1/float(ticker[0]['bid']))-fee
+        
+            coast_total=tmp_cost-((1/float(ticker[0]['ask']))-(1/float(ticker[0]['bid'])))
         return max(direct_transfer,coast_total)
+    
     else:
         return -1
-    
 
+print(background_transfer("ETH","Bitfinex","Bitstamp",1))
+"""
 def get_money(crypto,exchange):
     return 0
 

@@ -19,26 +19,19 @@ def random_number(mu,sigma):
     return np.random(100000)*sigma+mu
         
 
-def backtest(market):
+def backtest(market,monney):
     
     # cash in the wallet
-    monney={'BITF':{'BTC':1,'ETH':10,'USD':10000},'BITS':{'BTC':1,'ETH':10,'USD':10000},'CXIO':{'BTC':1,'ETH':10,'USD':10000}}
     #pair=['BITF/BITS','BITF/KRKN','BITF/CXIO','BITS/BITF','BITS/KRKN','BITS/CXIO','KRKN/BITF','KRKN/BITS','KRKN/CXIO','CXIO/BITF','CXIO/BITS','CXIO/KRKN']
-    
-    btc=0
-    eth=1
-    usd=2
-    begin=0
 
-    for elt,cle in monney.items():
-       begin+=cle['BTC']*float(prices()[0]['price_usd'])
-       begin+=cle['ETH']*float(prices()[1]['price_usd'])
-       begin+=cle['USD']
+    #monney in the wallet at the beginning    
+   
 
 
     market=['BTC/USD','ETH/USD','ETH/BTC']
     buy="ask"
     sell="bid"
+    
     #get datas yields 
     liste=get_yield(market)
     index_market=0
@@ -57,27 +50,46 @@ def backtest(market):
                 ticker2=market[index_market][market[index_market].find('/',2)+1:]
                 
                 amount=monney[plateforme1][ticker1]*0.1
-                monney[plateforme1][ticker1]=monney[plateforme1][ticker1]-amount
-                monney[plateforme1][ticker2]=monney[plateforme1][ticker2]+amount*float(price1[sell])
-
-                monney[plateforme2][ticker2]=monney[plateforme2][ticker2]-amount*float(price2[buy])
-                monney[plateforme2][ticker1]=monney[plateforme2][ticker1]+amount*0.1
+                #print(str(ticker1)+" "+str(amount))
+                
+                #rajouter conditions sur wallet
+                if(monney[plateforme1][ticker2]-amount*float(price1[buy])>=0 and monney[plateforme2][ticker1]-amount>=0):
+                    monney[plateforme1][ticker1]=monney[plateforme1][ticker1]+amount
+                    monney[plateforme1][ticker2]=monney[plateforme1][ticker2]-amount*float(price1[buy])
+    
+                    monney[plateforme2][ticker2]=monney[plateforme2][ticker2]+amount*float(price2[sell])
+                    monney[plateforme2][ticker1]=monney[plateforme2][ticker1]-amount
                 
         index_market+=1
-    print(monney)
-    after=0
-    for elt,cle in monney.items():
-       after+=cle['BTC']*float(prices()[0]['price_usd'])
-       after+=cle['ETH']*float(prices()[1]['price_usd'])
-       after+=cle['USD']
-    print(begin)
-    print(after)
+    #print(monney)
+    
         
-           
-           #(pair[0],pair[2][0:pair.find('/',2)])
 
 
 if __name__=="__main__":
     market=['BTC/USD','ETH/USD','ETH/BTC']
-    backtest(market)
+    monney={'BITF':{'BTC':1,'ETH':10,'USD':10000},'BITS':{'BTC':1,'ETH':10,'USD':10000},'CXIO':{'BTC':1,'ETH':10,'USD':10000}}
+    begin=0
+    begin_btc=0
+    for elt,cle in monney.items():
+       begin+=cle['BTC']*float(prices()[0]['price_usd'])
+       begin+=cle['ETH']*float(prices()[1]['price_usd'])
+       begin+=cle['USD']
+       begin_btc=cle['BTC']+cle['USD']/float(prices()[0]['price_usd'])+cle['ETH']*float(prices()[1]['price_btc'])
+
+    print("Monney in the wallets: "+str(round(begin,2))+"$, "+str(round(begin_btc,2))+"BTC.")
+
+    for i in range(0,10):
+        backtest(market,monney)
+        
+        after=0
+        after_btc=0
+        
+        for elt,cle in monney.items():
+            after+=cle['BTC']*float(prices()[0]['price_usd'])
+            after+=cle['ETH']*float(prices()[1]['price_usd'])
+            after+=cle['USD']
+            after_btc=cle['BTC']+cle['USD']/float(prices()[0]['price_usd'])+cle['ETH']*float(prices()[1]['price_btc'])
+        print("Monney in the wallets: "+str(round(after,2))+"$ , "+str(round(after_btc,2))+"BTC.")
+    print(monney)
     
