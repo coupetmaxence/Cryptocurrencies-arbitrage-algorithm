@@ -75,7 +75,7 @@ if __name__=="__main__":
        begin+=cle['BTC']*float(prices()[0]['price_usd'])
        begin+=cle['ETH']*float(prices()[1]['price_usd'])
        begin+=cle['USD']
-       begin_btc=cle['BTC']+cle['USD']/float(prices()[0]['price_usd'])+cle['ETH']*float(prices()[1]['price_btc'])
+       begin_btc+=cle['BTC']+cle['USD']/float(prices()[0]['price_usd'])+cle['ETH']*float(prices()[1]['price_btc'])
 
     print("Monney in the wallets: "+str(round(begin,2))+"$, "+str(round(begin_btc,2))+"BTC.")
 
@@ -89,7 +89,6 @@ if __name__=="__main__":
             after+=cle['BTC']*float(prices()[0]['price_usd'])
             after+=cle['ETH']*float(prices()[1]['price_usd'])
             after+=cle['USD']
-            after_btc=cle['BTC']+cle['USD']/float(prices()[0]['price_usd'])+cle['ETH']*float(prices()[1]['price_btc'])
+            after_btc+=cle['BTC']+cle['USD']/float(prices()[0]['price_usd'])+cle['ETH']*float(prices()[1]['price_btc'])
         print("Monney in the wallets: "+str(round(after,2))+"$ , "+str(round(after_btc,2))+"BTC.")
     print(monney)
-    

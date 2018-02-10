@@ -285,7 +285,10 @@ def confirmation_order(order_id, timestamp):
                 if(order['order_status']=='Executed'):
                     condition = True
     return condition
-"""
+
+
+#Ajouter verif crypto dispo sur A et B
+
 def background_transfer(crypto,plateformA,plateformB,volume):
     dictionnary=get_dictionnary()
     if(volume<dictionnary[plateformA][crypto][2] or dictionnary[plateformA][crypto][2]==-1):
@@ -336,8 +339,8 @@ def background_transfer(crypto,plateformA,plateformB,volume):
     else:
         return -1
 
-print(background_transfer("ETH","Bitfinex","Bitstamp",1))
-"""
+#print(background_transfer("ETH","Bitfinex","Bitstamp",1))
+
 def get_money(crypto,exchange):
     return 0
 
